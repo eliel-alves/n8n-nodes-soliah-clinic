@@ -1,0 +1,51 @@
+{
+  "name": "n8n-nodes-soliah-clinic",
+  "version": "0.1.0",
+  "description": "n8n community node for Soliah Clinic CRM — Personal Access Token auth",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "soliah",
+    "soliah clinic",
+    "crm",
+    "clinic",
+    "deals",
+    "automation",
+    "workflow"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Eliel Alves",
+    "email": "elielalves.dev@gmail.com"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && npm run copy:icons",
+    "copy:icons": "mkdir -p dist/nodes/SoliahClinic && cp nodes/SoliahClinic/soliah-logo.png dist/nodes/SoliahClinic/soliah-logo.png",
+    "dev": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/SoliahClinicApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/SoliahClinic/SoliahClinic.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "n8n-workflow": "^1.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
