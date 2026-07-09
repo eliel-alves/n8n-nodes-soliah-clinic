@@ -1,0 +1,36 @@
+name: Publish to npm
+
+# Publica no npm automaticamente quando você cria uma tag de versão (ex.: v0.1.1),
+# ou manualmente pela aba Actions (workflow_dispatch).
+# Requer o secret NPM_TOKEN (token de automação do npm, isento de 2FA/OTP).
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write # necessário para o provenance do npm
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - run: npm ci
+
+      - run: npm run build
+
+      # --provenance adiciona o selo de origem verificada (repo público).
+      # Se seu token não suportar provenance, troque por: npm publish --access public
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
