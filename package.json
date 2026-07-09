@@ -18,6 +18,14 @@
     "name": "Eliel Alves",
     "email": "elielalves.dev@gmail.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliel-alves/n8n-nodes-soliah-clinic.git"
+  },
+  "homepage": "https://github.com/eliel-alves/n8n-nodes-soliah-clinic#readme",
+  "bugs": {
+    "url": "https://github.com/eliel-alves/n8n-nodes-soliah-clinic/issues"
+  },
   "main": "index.js",
   "scripts": {
     "build": "tsc && npm run copy:icons",
