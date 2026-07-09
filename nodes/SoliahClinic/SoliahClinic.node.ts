@@ -170,7 +170,8 @@ export class SoliahClinic implements INodeType {
 					const dealId = this.getNodeParameter('dealId', i) as string;
 					const tagId = this.getNodeParameter('tagId', i) as string;
 					if (operation === 'attach') {
-						responseData = await soliahApiRequest.call(this, 'POST', `/deals/${dealId}/tags`, { tagId });
+						const response = await soliahApiRequest.call(this, 'POST', `/deals/${dealId}/tags`, { tagId });
+						responseData = response.data ?? response;
 					} else if (operation === 'detach') {
 						await soliahApiRequest.call(this, 'DELETE', `/deals/${dealId}/tags/${tagId}`);
 						responseData = { success: true, dealId, tagId };
