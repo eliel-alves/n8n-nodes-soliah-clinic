@@ -10,7 +10,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      id-token: write # OIDC: npm confia neste workflow, sem token de longa duração
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -19,20 +20,17 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      # OIDC trusted publishing exige npm >= 11.5.1 (Node 20 traz npm 10).
+      - name: Atualizar npm
+        run: npm install -g npm@latest
+
       - name: Instalar dependências
         run: npm ci
 
       - name: Build
         run: npm run build
 
-      - name: Verificar autenticação no npm
-        run: |
-          npm whoami
-          npm view n8n-nodes-soliah-clinic version
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publicar no npm
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Sem NODE_AUTH_TOKEN: o npm CLI troca o token OIDC automaticamente.
+      # Com trusted publisher configurado, o provenance é gerado sozinho.
+      - name: Publicar no npm (OIDC)
+        run: npm publish --access public
