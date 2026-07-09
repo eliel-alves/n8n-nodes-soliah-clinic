@@ -88,6 +88,20 @@ export class SoliahClinic implements INodeType {
 					value: r.id as string,
 				}));
 			},
+			async getSourceChannels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await soliahApiRequest.call(this, 'GET', '/source-channels');
+				return ((response.data ?? []) as IDataObject[]).map((c) => ({
+					name: c.name as string,
+					value: c.id as string,
+				}));
+			},
+			async getCustomFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await soliahApiRequest.call(this, 'GET', '/custom-fields');
+				return ((response.data ?? []) as IDataObject[]).map((f) => ({
+					name: f.name as string,
+					value: f.id as string,
+				}));
+			},
 		},
 	};
 
@@ -97,19 +111,31 @@ export class SoliahClinic implements INodeType {
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
 
+		// Extrai as entradas do fixedCollection "Campos Personalizados" para o
+		// formato que a API espera: [{ field_id, value }].
+		function extractCustomFields(raw: IDataObject): IDataObject[] {
+			const entries = (raw.field as IDataObject[] | undefined) ?? [];
+			return entries
+				.filter((e) => e.field_id)
+				.map((e) => ({ field_id: e.field_id, value: e.value ?? '' }));
+		}
+
 		for (let i = 0; i < items.length; i++) {
 			try {
 				let responseData: any;
 
 				if (resource === 'deal') {
 					if (operation === 'create') {
+						const customFields = extractCustomFields(this.getNodeParameter('customFields', i, {}) as IDataObject);
 						const body: IDataObject = cleanData({
 							title: this.getNodeParameter('title', i) as string,
 							lead_name: this.getNodeParameter('lead_name', i) as string,
 							pipeline_id: this.getNodeParameter('pipeline_id', i) as string,
 							stage_id: this.getNodeParameter('stage_id', i) as string,
+							responsavel_profile_id: this.getNodeParameter('responsavel_profile_id', i) as string,
 							...(this.getNodeParameter('additionalFields', i, {}) as IDataObject),
 						});
+						if (customFields.length) body.custom_fields = customFields;
 						const response = await soliahApiRequest.call(this, 'POST', '/deals', body);
 						responseData = response.data ?? response;
 					} else if (operation === 'get') {
@@ -129,10 +155,12 @@ export class SoliahClinic implements INodeType {
 					} else if (operation === 'update') {
 						const dealId = this.getNodeParameter('dealId', i) as string;
 						const stageId = this.getNodeParameter('stage_id', i, '') as string;
+						const customFields = extractCustomFields(this.getNodeParameter('customFields', i, {}) as IDataObject);
 						const body: IDataObject = cleanData({
 							...(stageId ? { stage_id: stageId } : {}),
 							...(this.getNodeParameter('updateFields', i, {}) as IDataObject),
 						});
+						if (customFields.length) body.custom_fields = customFields;
 						const response = await soliahApiRequest.call(this, 'PATCH', `/deals/${dealId}`, body);
 						responseData = response.data ?? response;
 					} else if (operation === 'delete') {

@@ -68,6 +68,16 @@ export const dealFields: INodeProperties[] = [
 		default: '',
 		description: 'Etapa dentro do funil selecionado',
 	},
+	{
+		displayName: 'Responsável',
+		name: 'responsavel_profile_id',
+		type: 'options',
+		typeOptions: { loadOptionsMethod: 'getOwners' },
+		required: true,
+		displayOptions: { show: { resource: ['deal'], operation: ['create'] } },
+		default: '',
+		description: 'Responsável pela negociação',
+	},
 	// --- create: campos opcionais ---
 	{
 		displayName: 'Campos Adicionais',
@@ -77,16 +87,19 @@ export const dealFields: INodeProperties[] = [
 		default: {},
 		displayOptions: { show: { resource: ['deal'], operation: ['create'] } },
 		options: [
-			{ displayName: 'Responsável', name: 'responsavel_profile_id', type: 'options', typeOptions: { loadOptionsMethod: 'getOwners' }, default: '', description: 'Responsável pela negociação (default: owner do token)' },
 			{ displayName: 'Valor (centavos)', name: 'value_cents', type: 'number', default: 0, description: 'Valor da negociação em centavos' },
 			{ displayName: 'Telefone Do Lead', name: 'lead_phone', type: 'string', default: '' },
 			{ displayName: 'E-mail Do Lead', name: 'lead_email', type: 'string', default: '' },
 			{ displayName: 'ID Do Paciente', name: 'patient_id', type: 'string', default: '', description: 'UUID de um paciente da organização' },
-			{ displayName: 'Serviço', name: 'service_id', type: 'options', typeOptions: { loadOptionsMethod: 'getServices' }, default: '' },
-			{ displayName: 'Canal De Origem (ID)', name: 'source_channel_id', type: 'string', default: '' },
+			{ displayName: 'Canal De Origem', name: 'source_channel_id', type: 'options', typeOptions: { loadOptionsMethod: 'getSourceChannels' }, default: '' },
 			{ displayName: 'Detalhe Da Origem', name: 'source_detail', type: 'string', default: '' },
 			{ displayName: 'Data Prevista De Fechamento', name: 'expected_close_date', type: 'string', default: '', description: 'Formato YYYY-MM-DD' },
 			{ displayName: 'Observações', name: 'observations', type: 'string', typeOptions: { rows: 3 }, default: '' },
+			{ displayName: 'UTM Source', name: 'utm_source', type: 'string', default: '' },
+			{ displayName: 'UTM Medium', name: 'utm_medium', type: 'string', default: '' },
+			{ displayName: 'UTM Campaign', name: 'utm_campaign', type: 'string', default: '' },
+			{ displayName: 'UTM Term', name: 'utm_term', type: 'string', default: '' },
+			{ displayName: 'UTM Content', name: 'utm_content', type: 'string', default: '' },
 		],
 	},
 	// --- update: seletor de etapa (top-level p/ loadOptions ter contexto de funil) ---
@@ -129,6 +142,31 @@ export const dealFields: INodeProperties[] = [
 			{ displayName: 'Serviço', name: 'service_id', type: 'options', typeOptions: { loadOptionsMethod: 'getServices' }, default: '' },
 			{ displayName: 'Data Prevista De Fechamento', name: 'expected_close_date', type: 'string', default: '', description: 'Formato YYYY-MM-DD' },
 			{ displayName: 'Observações', name: 'observations', type: 'string', typeOptions: { rows: 3 }, default: '' },
+			{ displayName: 'UTM Source', name: 'utm_source', type: 'string', default: '' },
+			{ displayName: 'UTM Medium', name: 'utm_medium', type: 'string', default: '' },
+			{ displayName: 'UTM Campaign', name: 'utm_campaign', type: 'string', default: '' },
+			{ displayName: 'UTM Term', name: 'utm_term', type: 'string', default: '' },
+			{ displayName: 'UTM Content', name: 'utm_content', type: 'string', default: '' },
+		],
+	},
+	// --- Campos personalizados (create + update) ---
+	{
+		displayName: 'Campos Personalizados',
+		name: 'customFields',
+		type: 'fixedCollection',
+		typeOptions: { multipleValues: true },
+		placeholder: 'Adicionar campo personalizado',
+		default: {},
+		displayOptions: { show: { resource: ['deal'], operation: ['create', 'update'] } },
+		options: [
+			{
+				name: 'field',
+				displayName: 'Campo',
+				values: [
+					{ displayName: 'Campo', name: 'field_id', type: 'options', typeOptions: { loadOptionsMethod: 'getCustomFields' }, default: '', description: 'Campo personalizado da organização' },
+					{ displayName: 'Valor', name: 'value', type: 'string', default: '', description: 'Para campos de seleção, informe o rótulo (ou o ID) da opção' },
+				],
+			},
 		],
 	},
 	// --- getAll ---
